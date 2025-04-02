@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Activity Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+</head>
+<body>
+    <h1>Personal Activity Tracker</h1>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('entry')">Data Entry</button>
+            <button class="tab-button" onclick="showTab('view')">View Data</button>
+            <button class="tab-button" onclick="showTab('analysis')">Analysis</button>
+        </div>
+
+        <!-- Data Entry Tab -->
+        <div id="entry" class="tab-content active">
+            <h2>Log New Entry</h2>
+            <form id="entryForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalActs">Total Sexual Acts:</label>
+                        <input type="number" id="totalActs" min="0" value="0">
+                    </div>
+                     <div class="form-group">
+                        <label for="partnersNum">Number of Partners:</label>
+                        <input type="number" id="partnersNum" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="masturbation">Masturbation Count:</label>
+                        <input type="number" id="masturbation" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="katCums">Partner "Kat" Orgasms:</label>
+                        <input type="number" id="katCums" min="0" value="0">
+                    </div>
+                     <div class="form-group">
+                        <label for="selfOrgasms">Self Orgasms:</label>
+                        <input type="number" id="selfOrgasms" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="analYN">Anal Sex (Y/N):</label>
+                        <input type="checkbox" id="analYN">
+                    </div>
+                    <div class="form-group">
+                        <label for="workoutYN">Workout (Y/N):</label>
+                        <input type="checkbox" id="workoutYN">
+                    </div>
+                     <div class="form-group">
+                        <label for="dateDinnerYN">Date/Dinner (Y/N):</label>
+                        <input type="checkbox" id="dateDinnerYN">
+                    </div>
+                    <div class="form-group">
+                        <label for="dateCost">Date/Dinner Cost:</label>
+                        <input type="number" id="dateCost" min="0" step="0.01" value="0">
+                    </div>
+                     <div class="form-group form-group-full">
+                        <label for="partnersList">Partners Involved (comma-separated):</label>
+                        <input type="text" id="partnersList" placeholder="e.g., Kat, Em, SJ">
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="workoutDetails">Workout Details:</label>
+                        <textarea id="workoutDetails" rows="2"></textarea>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="notes">General Notes / Description:</label>
+                        <textarea id="notes" rows="4" placeholder="Detailed description of the day's events..."></textarea>
+                    </div>
+                </div>
+                <button type="submit">Add Entry</button>
+                 <button type="button" id="exportBtn">Export Data (JSON)</button>
+                 <button type="button" id="importBtn">Import Data (JSON)</button>
+                 <input type="file" id="importFile" accept=".json" style="display: none;">
+            </form>
+        </div>
+
+        <!-- View Data Tab -->
+        <div id="view" class="tab-content">
+            <h2>Logged Data</h2>
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Total Acts</th>
+                            <th># Partners</th>
+                            <th>Partners List</th>
+                            <th>Masturbation</th>
+                            <th>Self Orgasms</th>
+                            <th>Kat Orgasms</th>
+                            <th>Anal</th>
+                            <th>Workout</th>
+                            <th>Workout Details</th>
+                            <th>Date/Dinner</th>
+                            <th>Cost</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <!-- Data rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis" class="tab-content">
+            <h2>Data Analysis</h2>
+            <div id="summaryStats">
+                <h3>Summary Statistics</h3>
+                <p>Total Entries: <span id="statTotalEntries">0</span></p>
+                <p>Total Sexual Acts Logged: <span id="statTotalActs">0</span></p>
+                <p>Total Masturbation Count: <span id="statTotalMasturbation">0</span></p>
+                <p>Total Self Orgasms: <span id="statTotalSelfOrgasms">0</span></p>
+                <p>Total "Kat" Orgasms: <span id="statTotalKatOrgasms">0</span></p>
+                <p>Days with Anal Sex: <span id="statDaysAnal">0</span> (<span id="statPercAnal">0</span>%)</p>
+                <p>Days with Workouts: <span id="statDaysWorkout">0</span> (<span id="statPercWorkout">0</span>%)</p>
+                <p>Average Acts per Active Day: <span id="statAvgActsPerActiveDay">0.0</span></p>
+                <p>Most Frequent Partner(s): <span id="statMostFrequentPartner">-</span></p>
+                <!-- Add more stats as needed -->
+            </div>
+            <div class="charts-container">
+                 <div class="chart-card">
+                    <h3>Activity Over Time (Total Acts)</h3>
+                    <canvas id="actsOverTimeChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Partner Frequency</h3>
+                    <canvas id="partnerFrequencyChart"></canvas>
+                </div>
+                 <div class="chart-card">
+                    <h3>Activity by Day of Week</h3>
+                    <canvas id="activityByDowChart"></canvas>
+                </div>
+                 <div class="chart-card">
+                    <h3>Workout vs. Non-Workout Day Activity</h3>
+                     <p style="font-size: 0.8em; text-align: center;">(Avg. Acts on Workout Days vs. Non-Workout Days)</p>
+                    <canvas id="workoutVsActivityChart"></canvas>
+                </div>
+                <!-- Add more canvas elements for other charts -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
